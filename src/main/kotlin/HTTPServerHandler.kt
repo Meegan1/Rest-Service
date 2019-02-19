@@ -10,7 +10,7 @@ import javax.ws.rs.core.Response
 
 
 class HTTPServerHandler {
-    private val BASE_URI = URI.create("http://localhost:8080/api/")
+    private val BASE_URI = URI.create("http://0.0.0.0:8089/api/")
     private var resourceConfig = create()
     private var server = GrizzlyHttpServerFactory.createHttpServer(BASE_URI, resourceConfig, false)
 
