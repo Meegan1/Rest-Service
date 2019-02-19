@@ -1,5 +1,6 @@
 import me.meegan.rest.HTTPServerHandler
 import org.glassfish.jersey.server.model.Resource
+import org.junit.jupiter.api.Assertions.assertNotNull
 import javax.ws.rs.core.Response
 
 internal class HTTPServerHandlerTest {
@@ -21,6 +22,7 @@ internal class HTTPServerHandlerTest {
         }
 
         server.registerCommand(resourceBuilder.build())
-        readLine()
+
+        assertNotNull(server)
     }
 }
