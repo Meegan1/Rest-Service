@@ -7,11 +7,14 @@ import org.glassfish.jersey.server.model.Resource
 import java.net.URI
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Response
+import sun.plugin.navig.motif.Plugin.start
+
+
 
 
 class HTTPServerHandler {
     private val BASE_URI = URI.create("http://0.0.0.0:8089/api/")
-    private var resourceConfig = create()
+    private var resourceConfig : ResourceConfigBuilder = ResourceConfigBuilder()
     private var server = GrizzlyHttpServerFactory.createHttpServer(BASE_URI, resourceConfig, false)
 
     init {
@@ -27,27 +30,12 @@ class HTTPServerHandler {
 
     fun stop() {
         this.server.shutdownNow()
-        resourceConfig = ResourceConfig(resourceConfig)
+        resourceConfig = ResourceConfigBuilder(resourceConfig)
     }
 
-    fun create() : ResourceConfig {
-        val resourceBuilder = Resource.builder("hello")
-        resourceBuilder.addMethod("GET").handledBy {
-            Response.ok("Hello World!").build()
-        }
-
-        val noContentResponder = Inflector<ContainerRequestContext, Response> {
-            Response.noContent().build()
-        }
-        resourceBuilder.addMethod("HEAD").handledBy(noContentResponder)
-        resourceBuilder.addMethod("OPTIONS").handledBy(noContentResponder)
-
-        return ResourceConfig().registerResources(resourceBuilder.build())
-    }
-
-    fun registerCommand(resource : Resource) {
+    fun registerCommand(label: String, callback: ResourceCallback) {
         if(server.isStarted) stop()
-        resourceConfig.registerResources(resource)
+        resourceConfig.registerResource(label, callback)
         start()
     }
 }
