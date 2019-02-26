@@ -1,5 +1,8 @@
 package me.meegan.rest.utils
 
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Klaxon
+import com.beust.klaxon.Parser
 import org.glassfish.jersey.server.ContainerRequest
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.MultivaluedMap
@@ -40,6 +43,12 @@ class HTTPCommandUtil {
         val cr = data as ContainerRequest
         cr.bufferEntity()
         return cr.readEntity(String::class.java)
+    }
+
+    fun getBodyJSON(data: ContainerRequestContext): JsonObject {
+        val parser: Parser = Parser.default()
+        val stringBuilder: StringBuilder = StringBuilder(getBodyString(data))
+        return parser.parse(stringBuilder) as JsonObject
     }
 
 }
