@@ -39,13 +39,8 @@ dependencies {
 
     implementation 'com.beust:klaxon:5.0.1'
 
-    testCompile project(':')
-
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.2'
-
-}
-
-test {
+    testCompile 'junit:junit:4.12'
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit"
 
 }
 

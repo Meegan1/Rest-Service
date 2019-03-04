@@ -1,21 +1,22 @@
 import me.meegan.rest.HTTPServerHandler
-import org.glassfish.jersey.server.model.Resource
-import org.junit.jupiter.api.Assertions.assertNotNull
-import javax.ws.rs.core.Response
+import org.junit.Assert
+import org.junit.Test
 
-internal class HTTPServerHandlerTest {
+import org.junit.Assert.*
+import kotlin.test.assertTrue
 
-    @org.junit.jupiter.api.BeforeEach
-    fun setUp() {
-    }
+class HTTPServerHandlerTest {
+    val server = HTTPServerHandler()
 
-    @org.junit.jupiter.api.AfterEach
-    fun tearDown() {
-    }
-
-    @org.junit.jupiter.api.Test
+    @Test
     fun start() {
-        val server = HTTPServerHandler()
-        assertNotNull(server)
+        server.start()
+        assertTrue(server.isStarted())
+    }
+
+    @Test
+    fun stop() {
+        server.stop()
+        assertTrue(!server.isStarted())
     }
 }

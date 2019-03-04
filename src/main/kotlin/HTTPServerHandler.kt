@@ -1,15 +1,7 @@
 package me.meegan.rest
 
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory
-import org.glassfish.jersey.process.Inflector
-import org.glassfish.jersey.server.ResourceConfig
-import org.glassfish.jersey.server.model.Resource
 import java.net.URI
-import javax.ws.rs.container.ContainerRequestContext
-import javax.ws.rs.core.Response
-import sun.plugin.navig.motif.Plugin.start
-
-
 
 
 class HTTPServerHandler {
@@ -37,5 +29,9 @@ class HTTPServerHandler {
         if(server.isStarted) stop()
         resourceConfig.registerResource(label, callback)
         start()
+    }
+
+    fun isStarted() : Boolean {
+        return this.server.isStarted
     }
 }
