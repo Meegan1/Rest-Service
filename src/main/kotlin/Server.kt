@@ -13,6 +13,16 @@ fun main() {
     val tasks = mutableListOf<Task>()
     val server = HTTPServerHandler()
 
+    fun MutableList<Task>.addTask(task: Task) {
+
+        val index = tasks.binarySearch { String.CASE_INSENSITIVE_ORDER.compare(it.name, task.name) }
+
+        if(index >= 0)
+            this[index] = task
+        else
+            this.add(-(index+1), task)
+    }
+
     server.registerCommand("hi", object: ResourceCallback {
         override fun get(data: ContainerRequestContext): Response {
             return Response.ok("Hello World!").build()
@@ -29,12 +39,7 @@ fun main() {
             val taskDetails : String = HTTPCommandUtil().getBodyJSON(data).get("taskDetails").toString()
             val taskPriority : Int = HTTPCommandUtil().getBodyJSON(data).get("taskPriority") as Int
 
-            val index = tasks.binarySearch { String.CASE_INSENSITIVE_ORDER.compare(it.name, taskName) }
-
-            if(index != -1)
-                tasks[index] = Task(taskName, taskDetails, taskPriority)
-            else
-                tasks.add(Task(taskName, taskDetails, taskPriority))
+            tasks.addTask(Task(taskName, taskDetails, taskPriority))
 
             return Response.ok().build()
         }
@@ -72,10 +77,10 @@ fun main() {
         }
     })
 
-    tasks.add(Task("Washing", "I need to do the dishes", 0))
-    tasks.add(Task("Tidy", "The house is dirty", 2))
-    tasks.add(Task("Cleaning", "The house is dirty", 1))
-    tasks.add(Task("Shower", "", 2))
+    tasks.addTask(Task("Shower", "", 2))
+    tasks.addTask(Task("Cleaning", "The house is dirty", 1))
+    tasks.addTask(Task("Tidy", "The house is dirty", 2))
+    tasks.addTask(Task("Washing", "I need to do the dishes", 0))
 
     readLine()
 }
