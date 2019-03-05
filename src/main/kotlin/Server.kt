@@ -9,18 +9,17 @@ import javax.ws.rs.core.Response
 
 fun main() {
 
-    data class Task(val name: String, val details: String, val priority: Int)
-    val tasks = mutableListOf<Task>()
+    data class Resource(val name: String, val details: String, val script: String)
+    val resources = mutableListOf<Resource>()
     val server = HTTPServerHandler()
 
-    fun MutableList<Task>.addTask(task: Task) {
-
-        val index = tasks.binarySearch { String.CASE_INSENSITIVE_ORDER.compare(it.name, task.name) }
+    fun MutableList<Resource>.addResource(resource: Resource) {
+        val index = resources.binarySearch { String.CASE_INSENSITIVE_ORDER.compare(it.name, resource.name) }
 
         if(index >= 0)
-            this[index] = task
+            this[index] = resource
         else
-            this.add(-(index+1), task)
+            this.add(-(index+1), resource)
     }
 
     server.registerCommand("hi", object: ResourceCallback {
@@ -33,35 +32,35 @@ fun main() {
         }
     })
 
-    server.registerCommand("tasks", object : ResourceCallback {
+    server.registerCommand("resources", object : ResourceCallback {
         override fun post(data: ContainerRequestContext): Response {
-            val taskName : String = HTTPCommandUtil().getBodyJSON(data).get("taskName").toString()
-            val taskDetails : String = HTTPCommandUtil().getBodyJSON(data).get("taskDetails").toString()
-            val taskPriority : Int = HTTPCommandUtil().getBodyJSON(data).get("taskPriority") as Int
+            val resourceName : String = HTTPCommandUtil().getBodyJSON(data).get("resourceName").toString()
+            val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data).get("resourceDetails").toString()
+            val resourceScript : String = HTTPCommandUtil().getBodyJSON(data).get("resourceScript").toString()
 
-            tasks.addTask(Task(taskName, taskDetails, taskPriority))
+            resources.addResource(Resource(resourceName, resourceDetails, resourceScript))
 
             return Response.ok().build()
         }
 
         override fun get(data: ContainerRequestContext): Response {
-            return Response.ok(tasks).build()
+            return Response.ok(resources).build()
         }
     })
 
-    server.registerCommand("tasks/{task-id}", object : ResourceCallback {
+    server.registerCommand("resources/{resource-id}", object : ResourceCallback {
         override fun post(data: ContainerRequestContext): Response {
             return Response.ok().build()
         }
 
         override fun get(data: ContainerRequestContext): Response {
-            val taskID = HTTPCommandUtil().getPathParams(data).getFirst("task-id")
+            val taskID = HTTPCommandUtil().getPathParams(data).getFirst("resource-id")
 
 
-            if (taskID.toInt() >= tasks.size)
+            if (taskID.toInt() >= resources.size)
                 return Response.noContent().build()
 
-            val json = Klaxon().toJsonString(tasks[taskID.toInt()])
+            val json = Klaxon().toJsonString(resources[taskID.toInt()])
 
             return Response.ok(json).build()
         }
@@ -77,10 +76,7 @@ fun main() {
         }
     })
 
-    tasks.addTask(Task("Shower", "", 2))
-    tasks.addTask(Task("Cleaning", "The house is dirty", 1))
-    tasks.addTask(Task("Tidy", "The house is dirty", 2))
-    tasks.addTask(Task("Washing", "I need to do the dishes", 0))
+    resources.addResource(Resource("users", "prints out users", "println('user1')"))
 
     readLine()
 }
