@@ -1,7 +1,6 @@
 package me.meegan.rest.utils
 
 import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Klaxon
 import com.beust.klaxon.Parser
 import org.glassfish.jersey.server.ContainerRequest
 import javax.ws.rs.container.ContainerRequestContext
@@ -47,7 +46,7 @@ class HTTPCommandUtil {
 
     fun getBodyJSON(data: ContainerRequestContext): JsonObject {
         val parser: Parser = Parser.default()
-        val stringBuilder: StringBuilder = StringBuilder(getBodyString(data))
+        val stringBuilder = StringBuilder(getBodyString(data))
         return parser.parse(stringBuilder) as JsonObject
     }
 

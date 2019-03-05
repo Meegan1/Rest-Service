@@ -2,6 +2,9 @@ package me.meegan.rest
 
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory
 import java.net.URI
+import java.util.logging.ConsoleHandler
+import java.util.logging.Level
+import java.util.logging.Logger
 
 
 class HTTPServerHandler {
@@ -12,6 +15,13 @@ class HTTPServerHandler {
     init {
             this.start()
             Runtime.getRuntime().addShutdownHook(Thread(Runnable { this.server.shutdownNow() }))
+
+            val l = Logger.getLogger("org.glassfish.grizzly.http.server.HttpHandler")
+            l.setLevel(Level.CONFIG)
+            l.setUseParentHandlers(false)
+            val ch = ConsoleHandler()
+            ch.level = Level.ALL
+            l.addHandler(ch)
     }
 
     fun start() {
@@ -26,7 +36,7 @@ class HTTPServerHandler {
     }
 
     fun registerCommand(label: String, callback: ResourceCallback) {
-        if(server.isStarted) stop()
+        if(this.isStarted()) stop()
         resourceConfig.registerResource(label, callback)
         start()
     }
