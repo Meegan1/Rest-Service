@@ -56,12 +56,7 @@ fun main() {
                 val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data).get("resourceDetails").toString()
                 val resourceGet : String = HTTPCommandUtil().getBodyJSON(data).get("resourceGet").toString()
 
-                try {
-                    resources.addResource(Resource(resourceName, resourceDetails, resourceGet))
-                }
-                catch (e : Exception) {
-
-                }
+                resources.addResource(Resource(resourceName, resourceDetails, resourceGet))
 
                 return Response.ok().build()
             }
