@@ -3,9 +3,8 @@ package me.meegan.rest
 
 import org.glassfish.jersey.server.ResourceConfig
 import org.glassfish.jersey.server.model.Resource
-import javax.ws.rs.core.MediaType
-
 import javax.ws.rs.container.ContainerRequestContext
+import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
 internal class ResourceConfigBuilder : ResourceConfig {
@@ -39,12 +38,33 @@ internal class ResourceConfigBuilder : ResourceConfig {
         resourceBuilder.addMethod("POST").produces(MediaType.APPLICATION_JSON_TYPE)
             .handledBy { data -> callback.post(data) }
 
+        resourceBuilder.addMethod("PUT").produces(MediaType.APPLICATION_JSON_TYPE)
+            .handledBy { data -> callback.put(data) }
+
+        resourceBuilder.addMethod("PATCH").produces(MediaType.APPLICATION_JSON_TYPE)
+            .handledBy { data -> callback.patch(data) }
+
+        resourceBuilder.addMethod("DELETE").produces(MediaType.APPLICATION_JSON_TYPE)
+            .handledBy { data -> callback.delete(data) }
+
         val resource = resourceBuilder.build()
         registerResources(resource)
     }
+
+    fun removeResource(path: String) {
+        val resourceBuilder = Resource.builder()
+        resourceBuilder.path(path)
+
+        val resource = resourceBuilder.build()
+        registerResources(resource)
+    }
+
 }
 
 interface ResourceCallback {
-    fun post(data: ContainerRequestContext): Response
-    operator fun get(data: ContainerRequestContext): Response
+    fun post(data: ContainerRequestContext): Response = Response.serverError().build()
+    fun get(data: ContainerRequestContext): Response = Response.serverError().build()
+    fun put(data: ContainerRequestContext): Response = Response.serverError().build()
+    fun patch(data: ContainerRequestContext): Response = Response.serverError().build()
+    fun delete(data: ContainerRequestContext): Response = Response.serverError().build()
 }

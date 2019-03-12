@@ -7,8 +7,8 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 
-class HTTPServerHandler {
-    private val BASE_URI = URI.create("http://0.0.0.0:8089/api/")
+class HTTPServerHandler(val port: Int = 8089) {
+    private val BASE_URI = URI.create("http://0.0.0.0:$port/api/")
     private var resourceConfig : ResourceConfigBuilder = ResourceConfigBuilder()
     private var server = GrizzlyHttpServerFactory.createHttpServer(BASE_URI, resourceConfig, false)
 
@@ -17,7 +17,7 @@ class HTTPServerHandler {
             Runtime.getRuntime().addShutdownHook(Thread(Runnable { this.server.shutdownNow() }))
 
             val l = Logger.getLogger("org.glassfish.grizzly.http.server.HttpHandler")
-            l.setLevel(Level.CONFIG)
+            l.setLevel(Level.FINE)
             l.setUseParentHandlers(false)
             val ch = ConsoleHandler()
             ch.level = Level.ALL
@@ -38,6 +38,12 @@ class HTTPServerHandler {
     fun registerCommand(label: String, callback: ResourceCallback) {
         if(this.isStarted()) stop()
         resourceConfig.registerResource(label, callback)
+        start()
+    }
+
+    fun removeCommand(label: String) {
+        if(this.isStarted()) stop()
+        resourceConfig.removeResource(label)
         start()
     }
 
