@@ -56,6 +56,21 @@ fun main() {
 
     resources.addResource(Resource("hi", "prints out hi", "\"hi\""))
     resources.addResource(Resource("bye", "prints out bye", "\"bye\""))
+    resources.addResource(Resource("plus", "prints out 5+5", "5+5"))
+    resources.addResource(Resource("file", "prints out README.md",
+            "import java.io.File\n" +
+                    "var file = File(\"README.md\")\n" +
+                    "var fileName = file.name\n" +
+                    "var fileText = file.readText()\n" +
+                    "\n" +
+                    "data class FileResource(var name: String, var contents: String)\n" +
+                    "\n" +
+                    "var list = mutableListOf<FileResource>()\n" +
+                    "list.add(FileResource(fileName, fileText))\n" +
+                    "list"
+    ))
+
+
 
     readLine()
 }

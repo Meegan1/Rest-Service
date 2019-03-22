@@ -33,10 +33,11 @@ class ResourceList {
                     }
 
                     override fun get(data: ContainerRequestContext): Response {
-                        val script: String = try {
+                        val script: Any = try {
                             KtsObjectLoader().load(resource.get) }
                         catch (e: Exception) {
-                            return Response.serverError().entity(e.message).build()
+                            e.printStackTrace()
+                            return Response.serverError().entity(e.message).build() // Returns the error as a response
                         }
                         val response = Klaxon().toJsonString(script)
                         return Response.ok(response).build()
