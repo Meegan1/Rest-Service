@@ -1,6 +1,7 @@
 package me.meegan.rest
 
 import com.beust.klaxon.Klaxon
+import me.meegan.rest.plugin.PluginLoader
 import me.meegan.rest.utils.HTTPCommandUtil
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Response
@@ -9,6 +10,7 @@ import javax.ws.rs.core.Response
 fun main() {
     val resources = ResourceList()
     val server = HTTPServerHandler()
+    val plugins = PluginLoader()
 
     server.run {
         registerCommand("resources", object : ResourceCallback {
@@ -49,13 +51,7 @@ fun main() {
 
     resources.addResource(Resource("hi", "prints out hi", "\"hi\""))
     resources.addResource(Resource("bye", "prints out bye", "\"bye\""))
-    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5",
-    """val path = HTTPCommandUtil().getPathParams(data)
-            val number1 = path.getFirst("number1").toInt()
-            val number2 = path.getFirst("number2").toInt()
-            val result = number1 + number2
-            result"""
-    ))
+    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5", plugins.getPluginScript("Keyboard")))
 
     resources.addResource(Resource("file", "prints out README.md",
             "import java.io.File\n" +
