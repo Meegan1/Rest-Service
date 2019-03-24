@@ -49,15 +49,13 @@ fun main() {
 
     resources.addResource(Resource("hi", "prints out hi", "\"hi\""))
     resources.addResource(Resource("bye", "prints out bye", "\"bye\""))
-    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5", "" +
-            "import me.meegan.rest.utils.HTTPCommandUtil\n" +
-            "import javax.ws.rs.container.ContainerRequestContext\n" +
-            "val data = bindings[\"data\"] as ContainerRequestContext\n" +
-            "val path = HTTPCommandUtil().getPathParams(data)\n" +
-            "val number1 = path.getFirst(\"number1\").toInt()\n" +
-            "val number2 = path.getFirst(\"number2\").toInt()\n" +
-            "val result = number1 + number2\n" +
-            "result"))
+    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5",
+    """val path = HTTPCommandUtil().getPathParams(data)
+            val number1 = path.getFirst("number1").toInt()
+            val number2 = path.getFirst("number2").toInt()
+            val result = number1 + number2
+            result"""
+    ))
 
     resources.addResource(Resource("file", "prints out README.md",
             "import java.io.File\n" +

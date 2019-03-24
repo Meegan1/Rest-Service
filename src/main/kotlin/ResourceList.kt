@@ -37,7 +37,7 @@ class ResourceList {
                         val script: Any = try {
                             val engine = KtsObjectLoader()
                             engine.engine.put("data", data)
-                            engine.load(resource.get) }
+                            engine.load(getScriptHeader() + resource.get) }
                         catch (e: Exception) {
                             e.printStackTrace()
                             return Response.serverError().entity(e.message).build() // Returns the error as a response
@@ -65,6 +65,12 @@ class ResourceList {
             removeResource(index)
         }
     }
+
+    private fun getScriptHeader() : String = """
+        import me.meegan.rest.utils.HTTPCommandUtil
+        import javax.ws.rs.container.ContainerRequestContext
+        val data = bindings["data"] as ContainerRequestContext
+        """
 
 }
 
