@@ -36,7 +36,7 @@ class ResourceList {
                     override fun get(data: ContainerRequestContext): Response {
                         val script: Any = try {
                             val engine = KtsObjectLoader()
-                            engine.engine.put("pathParams", HTTPCommandUtil().getPathParams(data))
+                            engine.engine.put("data", data)
                             engine.load(resource.get) }
                         catch (e: Exception) {
                             e.printStackTrace()
