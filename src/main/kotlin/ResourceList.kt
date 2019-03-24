@@ -2,6 +2,7 @@ package me.meegan.rest
 
 import com.beust.klaxon.Klaxon
 import de.swirtz.ktsrunner.objectloader.KtsObjectLoader
+import me.meegan.rest.utils.HTTPCommandUtil
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Response
 
@@ -34,7 +35,9 @@ class ResourceList {
 
                     override fun get(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            KtsObjectLoader().load(resource.get) }
+                            val engine = KtsObjectLoader()
+                            engine.engine.put("pathParams", HTTPCommandUtil().getPathParams(data))
+                            engine.load(resource.get) }
                         catch (e: Exception) {
                             e.printStackTrace()
                             return Response.serverError().entity(e.message).build() // Returns the error as a response

@@ -2,7 +2,6 @@ package me.meegan.rest
 
 import com.beust.klaxon.Klaxon
 import me.meegan.rest.utils.HTTPCommandUtil
-import java.time.LocalDateTime
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Response
 
@@ -14,9 +13,9 @@ fun main() {
     server.run {
         registerCommand("resources", object : ResourceCallback {
             override fun post(data: ContainerRequestContext): Response {
-                val resourceName : String = HTTPCommandUtil().getBodyJSON(data).get("name").toString()
-                val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data).get("details").toString()
-                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data).get("get").toString()
+                val resourceName : String = HTTPCommandUtil().getBodyJSON(data)["name"].toString()
+                val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data)["details"].toString()
+                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["get"].toString()
 
                 resources.addResource(Resource(resourceName, resourceDetails, resourceGet))
 
@@ -46,17 +45,15 @@ fun main() {
                 return Response.ok().build()
             }
         })
-
-        registerCommand("date", object : ResourceCallback {
-            override fun get(data: ContainerRequestContext): Response {
-                return Response.ok(LocalDateTime.now()).build()
-            }
-        })
     }
 
     resources.addResource(Resource("hi", "prints out hi", "\"hi\""))
     resources.addResource(Resource("bye", "prints out bye", "\"bye\""))
-    resources.addResource(Resource("plus", "prints out 5+5", "5+5"))
+    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5", "" +
+            "import javax.ws.rs.core.MultivaluedMap\n" +
+            "val pathParams = bindings[\"pathParams\"] as MultivaluedMap<String, String>\n" +
+            "pathParams.getFirst(\"number1\").toInt() + pathParams.getFirst(\"number2\").toInt()"))
+
     resources.addResource(Resource("file", "prints out README.md",
             "import java.io.File\n" +
                     "var file = File(\"README.md\")\n" +
@@ -69,8 +66,6 @@ fun main() {
                     "list.add(FileResource(fileName, fileText))\n" +
                     "list"
     ))
-
-
 
     readLine()
 }
