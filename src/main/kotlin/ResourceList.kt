@@ -1,7 +1,7 @@
 package me.meegan.rest
 
 import com.beust.klaxon.Klaxon
-import de.swirtz.ktsrunner.objectloader.KtsObjectLoader
+import me.meegan.rest.plugin.Plugin
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Response
 
@@ -34,7 +34,8 @@ class ResourceList {
 
                     override fun get(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            KtsObjectLoader().load(resource.get) }
+                                resource.get.run(data)
+                             }
                         catch (e: Exception) {
                             e.printStackTrace()
                             return Response.serverError().entity(e.message).build() // Returns the error as a response
@@ -62,8 +63,9 @@ class ResourceList {
             removeResource(index)
         }
     }
-
 }
 
 
-data class Resource(var name: String, var details: String, var get: String)
+data class Resource(var name: String, var details: String, var get: Plugin) {
+    constructor(name: String, details: String, get: String) : this(name, details, Plugin("Script", "This is a generic Script", get))
+}

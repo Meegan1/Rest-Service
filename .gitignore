@@ -2,6 +2,7 @@
 /build/
 
 out
+plugins
 
 ### IntelliJ IDEA ###
 .idea
