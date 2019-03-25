@@ -3,6 +3,7 @@ package me.meegan.rest
 import com.beust.klaxon.Klaxon
 import me.meegan.rest.plugin.PluginLoader
 import me.meegan.rest.utils.HTTPCommandUtil
+import java.awt.event.KeyEvent
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Response
 
@@ -51,7 +52,7 @@ fun main() {
 
     resources.addResource(Resource("hi", "prints out hi", "\"hi\""))
     resources.addResource(Resource("bye", "prints out bye", "\"bye\""))
-    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5", plugins.getPluginScript("Keyboard")))
+    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5", plugins.getPlugin("Addition")))
 
     resources.addResource(Resource("file", "prints out README.md",
             "import java.io.File\n" +
@@ -64,6 +65,26 @@ fun main() {
                     "var list = mutableListOf<FileResource>()\n" +
                     "list.add(FileResource(fileName, fileText))\n" +
                     "list"
+    ))
+
+    resources.addResource(Resource(
+        "forward",
+        "presses right on host pc",
+        plugins.newPlugin(
+            "Keyboard",
+            ("key" to KeyEvent.VK_RIGHT),
+            ("success" to "You have moved forwards!")
+        )
+    ))
+
+    resources.addResource(Resource(
+        "back",
+        "presses left on host pc",
+        plugins.newPlugin(
+            "Keyboard",
+            ("key" to KeyEvent.VK_LEFT),
+            ("success" to "You have moved backwards!")
+        )
     ))
 
     readLine()

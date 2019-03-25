@@ -11,37 +11,33 @@ class PluginLoader {
 
     init {
         directory.mkdirs()
-        directory.walk().forEach {
-            if(it.isDirectory) {
-                val manifest = File(it.absolutePath + "/plugin.manifest")
-                val script = File(it.absolutePath + "/script.kts")
-
-                if(manifest.exists() && script.exists()) {
-                    val json = Parser.default().parse(manifest.inputStream()) as JsonObject
-                    if(!json.containsKey("params"))
-                        plugins.add(Plugin(json!!["name"] as String, json["details"] as String, script.readText()))
-                    else
-                        plugins.add(Plugin(json!!["name"] as String, json["details"] as String, script.readText(),
-                            json["params"] as List<Parameter>?
-                        ))
-                }
-            }
-        }
+        reload()
     }
 
     fun reload() = directory.walk().forEach {
         if(it.isDirectory) {
-            val manifest = File(it.absolutePath + "plugin" + ".manifest")
-            val script = File(it.absolutePath + "script.kts")
+            val manifest = File(it.absolutePath + "/plugin.manifest")
+            val script = File(it.absolutePath + "/script.kts")
+            val scriptHeader = File(it.absolutePath + "/script-header.kts")
 
             if(manifest.exists() && script.exists()) {
-                val json = Klaxon().parse<JsonObject>(manifest)
-                plugins.add(Plugin(json!!["name"] as String, json["details"] as String, script.readText()))
+                val json = Parser.default().parse(manifest.inputStream()) as JsonObject
+                plugins.add(Plugin(
+                    json["name"] as String,
+                    json["details"] as String,
+                    script.readText(),
+                    if (scriptHeader.exists()) scriptHeader.readText() else ""
+                ))
             }
         }
     }
 
-    fun getPluginScript(name: String): String {
-        return plugins.find { it.name.equals(name) }!!.script
+    fun getPlugin(name: String): Plugin {
+        return plugins.find { it.name == name }!!
+    }
+
+    fun newPlugin(name : String, vararg params : Pair<String, Any>) : Plugin {
+        var plugin = getPlugin(name)
+        return Plugin(plugin.name, plugin.details, plugin.script, plugin.scriptHeader).withParams(*params)
     }
 }
