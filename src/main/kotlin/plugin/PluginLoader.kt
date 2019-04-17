@@ -41,16 +41,12 @@ object PluginLoader {
         var plugin = getPlugin(name)
         return Plugin(plugin.name, *params)
     }
-<<<<<<< HEAD
 
-    fun getList(): MutableList<Plugin> {
+    fun getList(): MutableList<PluginConfig> {
         return this.plugins
     }
-}
-=======
 }
 
 class PluginConfig(val name: String, val details: String, val script: String, val scriptHeader: String = "", val params: String)
 
 data class Parameter(val name: String, val details: String)
->>>>>>> kotlinscript-modules
