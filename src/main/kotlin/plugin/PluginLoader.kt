@@ -1,8 +1,6 @@
 package me.meegan.rest.plugin
 
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Klaxon
-import com.beust.klaxon.Parser
+import com.beust.klaxon.*
 import java.io.File
 
 object PluginLoader {
@@ -27,7 +25,7 @@ object PluginLoader {
                     json["details"] as String,
                     script.readText(),
                     if (scriptHeader.exists()) scriptHeader.readText() else "",
-                    json["parameters"].toString()
+                    json["parameters"] as JsonArray<out Any?>
                 ))
             }
         }
@@ -47,6 +45,6 @@ object PluginLoader {
     }
 }
 
-class PluginConfig(val name: String, val details: String, val script: String, val scriptHeader: String = "", val params: String)
+class PluginConfig(val name: String, val details: String, val script: String, val scriptHeader: String = "", val params: JsonArray<out Any?>)
 
 data class Parameter(val name: String, val details: String)
