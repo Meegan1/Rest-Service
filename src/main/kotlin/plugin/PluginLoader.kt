@@ -40,4 +40,8 @@ class PluginLoader {
         var plugin = getPlugin(name)
         return Plugin(plugin.name, plugin.details, plugin.script, plugin.scriptHeader).withParams(*params)
     }
+
+    fun getList(): MutableList<Plugin> {
+        return this.plugins
+    }
 }

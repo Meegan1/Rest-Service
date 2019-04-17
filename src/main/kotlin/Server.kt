@@ -48,6 +48,18 @@ fun main() {
                 return Response.ok().build()
             }
         })
+
+        registerCommand("status", object : ResourceCallback {
+            override fun get(data: ContainerRequestContext): Response {
+                return Response.ok(true).build()
+            }
+        })
+
+        registerCommand("plugins", object : ResourceCallback {
+            override fun get(data: ContainerRequestContext): Response {
+                return Response.ok(plugins.getList()).build()
+            }
+        })
     }
 
     resources.addResource(Resource("hi", "prints out hi", "\"hi\""))
