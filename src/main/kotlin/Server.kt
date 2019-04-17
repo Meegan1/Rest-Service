@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response
 fun main() {
     val resources = ResourceList()
     val server = HTTPServerHandler()
-    val plugins = PluginLoader()
+    val plugins = PluginLoader
 
     server.run {
         registerCommand("resources", object : ResourceCallback {
@@ -64,7 +64,7 @@ fun main() {
 
     resources.addResource(Resource("hi", "prints out hi", "\"hi\""))
     resources.addResource(Resource("bye", "prints out bye", "\"bye\""))
-    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5", plugins.getPlugin("Addition")))
+    resources.addResource(Resource("plus/{number1}/{number2}", "prints out 5+5", plugins.newPlugin("addition")))
 
     resources.addResource(Resource("file", "prints out README.md",
             "import java.io.File\n" +
@@ -83,7 +83,7 @@ fun main() {
         "forward",
         "presses right on host pc",
         plugins.newPlugin(
-            "Keyboard",
+            "keyboard",
             ("key" to KeyEvent.VK_RIGHT),
             ("success" to "You have moved forwards!")
         )
@@ -93,7 +93,7 @@ fun main() {
         "back",
         "presses left on host pc",
         plugins.newPlugin(
-            "Keyboard",
+            "keyboard",
             ("key" to KeyEvent.VK_LEFT),
             ("success" to "You have moved backwards!")
         )

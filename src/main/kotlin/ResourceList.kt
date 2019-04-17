@@ -2,6 +2,7 @@ package me.meegan.rest
 
 import com.beust.klaxon.Klaxon
 import me.meegan.rest.plugin.Plugin
+import me.meegan.rest.plugin.Script
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Response
 
@@ -67,5 +68,5 @@ class ResourceList {
 
 
 data class Resource(var name: String, var details: String, var get: Plugin) {
-    constructor(name: String, details: String, get: String) : this(name, details, Plugin("Script", "This is a generic Script", get))
+    constructor(name: String, details: String, get: String) : this(name, details, Script(get))
 }
