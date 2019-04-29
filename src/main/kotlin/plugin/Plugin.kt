@@ -2,6 +2,7 @@ package me.meegan.rest.plugin
 
 import de.swirtz.ktsrunner.objectloader.KtsObjectLoader
 import javax.ws.rs.container.ContainerRequestContext
+import javax.ws.rs.core.Response
 
 open class Plugin(val name: String, vararg val params: Pair<String, Any>) {
 
@@ -22,7 +23,7 @@ open class Plugin(val name: String, vararg val params: Pair<String, Any>) {
         """
 }
 
-class Script(val script: String) : Plugin("Custom Script") {
+open class Script(val script: String) : Plugin("Custom Script") {
     override fun run(data: ContainerRequestContext) : Any {
         val engine = KtsObjectLoader()
         engine.engine.put("data", data)
@@ -35,4 +36,10 @@ class Script(val script: String) : Plugin("Custom Script") {
         import javax.ws.rs.container.ContainerRequestContext
         val data = bindings["data"] as ContainerRequestContext
         """
+}
+
+class NullPlugin : Plugin("Invalid Request") {
+    override fun run(data: ContainerRequestContext): Any {
+        return Response.noContent()
+    }
 }

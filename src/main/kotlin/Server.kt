@@ -39,12 +39,26 @@ fun main() {
 
                 val json = Klaxon().toJsonString(resources[taskID.toInt()])
 
-                return Response.ok(json).build()
+                return Response.ok(resources[taskID.toInt()]).build()
             }
             override fun delete(data: ContainerRequestContext): Response {
                 val id = HTTPCommandUtil().getPathParams(data).getFirst("resource-id")
 
                 resources.removeResource(id.toInt())
+                return Response.ok().build()
+            }
+            override fun put(data: ContainerRequestContext): Response {
+                val taskID = HTTPCommandUtil().getPathParams(data).getFirst("resource-id")
+
+                if (taskID.toInt() >= resources.size())
+                    return Response.noContent().build()
+
+                val resourceName : String = HTTPCommandUtil().getBodyJSON(data)["name"].toString()
+                val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data)["details"].toString()
+                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["get"].toString()
+
+                resources.updateResource(taskID.toInt(), Resource(resourceName, resourceDetails, resourceGet))
+
                 return Response.ok().build()
             }
         })
