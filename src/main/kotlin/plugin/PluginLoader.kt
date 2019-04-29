@@ -1,12 +1,10 @@
 package me.meegan.rest.plugin
 
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Klaxon
-import com.beust.klaxon.Parser
+import com.beust.klaxon.*
 import java.io.File
 
-class PluginLoader {
-    private val plugins = mutableListOf<Plugin>()
+object PluginLoader {
+    private val plugins = mutableListOf<PluginConfig>()
     private val directory = File("plugins")
 
     init {
@@ -22,22 +20,31 @@ class PluginLoader {
 
             if(manifest.exists() && script.exists()) {
                 val json = Parser.default().parse(manifest.inputStream()) as JsonObject
-                plugins.add(Plugin(
+                plugins.add(PluginConfig(
                     json["name"] as String,
                     json["details"] as String,
                     script.readText(),
-                    if (scriptHeader.exists()) scriptHeader.readText() else ""
+                    if (scriptHeader.exists()) scriptHeader.readText() else "",
+                    json["parameters"] as JsonArray<out Any?>
                 ))
             }
         }
     }
 
-    fun getPlugin(name: String): Plugin {
+    fun getPlugin(name: String): PluginConfig {
         return plugins.find { it.name == name }!!
     }
 
     fun newPlugin(name : String, vararg params : Pair<String, Any>) : Plugin {
         var plugin = getPlugin(name)
-        return Plugin(plugin.name, plugin.details, plugin.script, plugin.scriptHeader).withParams(*params)
+        return Plugin(plugin.name, *params)
+    }
+
+    fun getList(): MutableList<PluginConfig> {
+        return this.plugins
     }
 }
+
+class PluginConfig(val name: String, val details: String, val script: String, val scriptHeader: String = "", val params: JsonArray<out Any?>)
+
+data class Parameter(val name: String, val details: String)
