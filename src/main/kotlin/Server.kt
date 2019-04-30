@@ -74,6 +74,17 @@ fun main() {
                 return Response.ok(plugins.getList()).build()
             }
         })
+
+        registerCommand("plugins/{plugin-id}", object : ResourceCallback {
+            override fun get(data: ContainerRequestContext): Response {
+                val pluginID = HTTPCommandUtil().getPathParams(data).getFirst("plugin-id")
+
+                if (pluginID.toInt() >= resources.size())
+                    return Response.noContent().build()
+
+                return Response.ok(plugins.getPlugin(pluginID.toInt())).build()
+            }
+        })
     }
 
     resources.addResource(Resource("hi", "prints out hi", "\"hi\""))

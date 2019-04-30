@@ -35,6 +35,10 @@ object PluginLoader {
         return plugins.find { it.name == name }!!
     }
 
+    fun getPlugin(id: Int): PluginConfig {
+        return plugins.get(id)
+    }
+
     fun newPlugin(name : String, vararg params : Pair<String, Any>) : Plugin {
         var plugin = getPlugin(name)
         return Plugin(plugin.name, *params)
