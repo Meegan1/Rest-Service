@@ -30,7 +30,7 @@ class ResourceList {
                 object: ResourceCallback {
                     override fun get(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                                resource.get.run(data)
+                                resource.getResource.run(data)
                              }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -42,7 +42,7 @@ class ResourceList {
 
                     override fun post(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            resource.post.run(data)
+                            resource.postResource.run(data)
                         }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -54,7 +54,7 @@ class ResourceList {
 
                     override fun put(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            resource.post.run(data)
+                            resource.putResource.run(data)
                         }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -66,7 +66,7 @@ class ResourceList {
 
                     override fun delete(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            resource.post.run(data)
+                            resource.deleteResource.run(data)
                         }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -78,7 +78,7 @@ class ResourceList {
 
                     override fun patch(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            resource.post.run(data)
+                            resource.patchResource.run(data)
                         }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -112,6 +112,6 @@ class ResourceList {
 }
 
 
-data class Resource(var name: String, var details: String, var get: Plugin = NullPlugin(), var post: Plugin = NullPlugin(), var put: Plugin = NullPlugin(), var delete: Plugin = NullPlugin(), var patch: Plugin = NullPlugin()) {
+data class Resource(var name: String, var details: String, var getResource: Plugin = NullPlugin(), var postResource: Plugin = NullPlugin(), var putResource: Plugin = NullPlugin(), var deleteResource: Plugin = NullPlugin(), var patchResource: Plugin = NullPlugin()) {
     constructor(name: String, details: String, get: String) : this(name, details, Script(get))
 }

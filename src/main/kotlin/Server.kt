@@ -18,7 +18,7 @@ fun main() {
             override fun post(data: ContainerRequestContext): Response {
                 val resourceName : String = HTTPCommandUtil().getBodyJSON(data)["name"].toString()
                 val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data)["details"].toString()
-                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["get"].toString()
+                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["getResource"].toString()
 
                 resources.addResource(Resource(resourceName, resourceDetails, resourceGet))
 
@@ -55,7 +55,7 @@ fun main() {
 
                 val resourceName : String = HTTPCommandUtil().getBodyJSON(data)["name"].toString()
                 val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data)["details"].toString()
-                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["get"].toString()
+                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["getResource"].toString()
 
                 resources.updateResource(taskID.toInt(), Resource(resourceName, resourceDetails, resourceGet))
 
