@@ -1,0 +1,8 @@
+version: '3'
+services:
+  rest:
+    build: .docker
+    container_name: rest_service
+    ports:
+      - 8089:8089
+      - 8088:8088
