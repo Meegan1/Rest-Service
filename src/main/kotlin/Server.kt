@@ -113,5 +113,8 @@ fun main() {
         )
     ))
 
+    resources.addResource(Resource("light/on", "turns on a light", plugins.newPlugin("pilight", ("value" to "on"))))
+    resources.addResource(Resource("light/off", "turns on a light", plugins.newPlugin("pilight", ("value" to "off"))))
+
     readLine()
 }
