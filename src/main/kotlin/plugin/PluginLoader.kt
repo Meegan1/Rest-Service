@@ -31,16 +31,16 @@ object PluginLoader {
         }
     }
 
-    fun getPlugin(name: String): PluginConfig {
-        return plugins.find { it.name == name }!!
+    fun getPlugin(name: String): PluginConfig? {
+        return plugins.find { it.name == name }
     }
 
     fun getPlugin(id: Int): PluginConfig {
-        return plugins.get(id)
+        return plugins[id]
     }
 
     fun newPlugin(name : String, vararg params : Pair<String, Any>) : Plugin {
-        var plugin = getPlugin(name)
+        val plugin = getPlugin(name) ?: return NullPlugin()
         return Plugin(plugin.name, *params)
     }
 

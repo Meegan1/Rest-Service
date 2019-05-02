@@ -1,5 +1,7 @@
 package me.meegan.rest
 
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Klaxon
 import me.meegan.rest.plugin.PluginLoader
 import me.meegan.rest.utils.HTTPCommandUtil
@@ -53,11 +55,35 @@ fun main() {
                 if (taskID.toInt() >= resources.size())
                     return Response.noContent().build()
 
-                val resourceName : String = HTTPCommandUtil().getBodyJSON(data)["name"].toString()
-                val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data)["details"].toString()
-                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["getResource"].toString()
+                val request = HTTPCommandUtil().getBodyJSON(data);
 
-                resources.updateResource(taskID.toInt(), Resource(resourceName, resourceDetails, resourceGet))
+                val resourceName : String = request["name"].toString()
+                val resourceDetails : String = request["details"].toString()
+                val getResource: JsonObject = request["getResource"] as JsonObject
+                val postResource: JsonObject = request["postResource"] as JsonObject
+                val putResource: JsonObject = request["putResource"] as JsonObject
+                val patchResource: JsonObject = request["patchResource"] as JsonObject
+                val deleteResource: JsonObject = request["deleteResource"] as JsonObject
+
+
+                val getParams = Klaxon().parseArray<Pair<String, Any>>((getResource["params"] as JsonArray<*>).toJsonString())
+                val getPlugin = plugins.newPlugin(getResource["name"] as String, *getParams!!.toTypedArray())
+
+                val postParams = Klaxon().parseArray<Pair<String, Any>>((postResource["params"] as JsonArray<*>).toJsonString())
+                val postPlugin = plugins.newPlugin(postResource["name"] as String, *postParams!!.toTypedArray())
+
+                val putParams = Klaxon().parseArray<Pair<String, Any>>((putResource["params"] as JsonArray<*>).toJsonString())
+                val putPlugin = plugins.newPlugin(putResource["name"] as String, *putParams!!.toTypedArray())
+
+                val patchParams = Klaxon().parseArray<Pair<String, Any>>((patchResource["params"] as JsonArray<*>).toJsonString())
+                val patchPlugin = plugins.newPlugin(patchResource["name"] as String, *patchParams!!.toTypedArray())
+
+                val deleteParams = Klaxon().parseArray<Pair<String, Any>>((deleteResource["params"] as JsonArray<*>).toJsonString())
+                val deletePlugin = plugins.newPlugin(deleteResource["name"] as String, *deleteParams!!.toTypedArray())
+
+
+
+                resources.updateResource(taskID.toInt(), Resource(resourceName, resourceDetails, getPlugin, postPlugin, putPlugin, deletePlugin, patchPlugin))
 
                 return Response.ok().build()
             }
@@ -111,6 +137,11 @@ fun main() {
             "keyboard",
             ("key" to KeyEvent.VK_RIGHT),
             ("success" to "You have moved forwards!")
+        ),
+        plugins.newPlugin(
+            "keyboard",
+            ("key" to KeyEvent.VK_LEFT),
+            ("success" to "You have moved backwards!")
         )
     ))
 

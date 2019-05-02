@@ -10,14 +10,14 @@ open class Plugin(val name: String, vararg val params: Pair<String, Any>) {
         val engine = KtsObjectLoader()
         engine.engine.put("data", data)
         engine.engine.put("params", params.toMap())
-        return engine.load(getScriptHead() + PluginLoader.getPlugin(name).script)
+        return engine.load(getScriptHead() + PluginLoader.getPlugin(name)!!.script)
     }
 
 
     private fun getScriptHead() : String = """
         import me.meegan.rest.utils.HTTPCommandUtil
         import javax.ws.rs.container.ContainerRequestContext
-        ${PluginLoader.getPlugin(name).scriptHeader}
+        ${PluginLoader.getPlugin(name)!!.scriptHeader}
         val data = bindings["data"] as ContainerRequestContext
         val params = bindings["params"] as Map<String, Any>
         """
