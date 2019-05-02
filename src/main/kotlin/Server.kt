@@ -18,11 +18,27 @@ fun main() {
     server.run {
         registerCommand("resources", object : ResourceCallback {
             override fun post(data: ContainerRequestContext): Response {
-                val resourceName : String = HTTPCommandUtil().getBodyJSON(data)["name"].toString()
-                val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data)["details"].toString()
-                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["getResource"].toString()
+                val request = HTTPCommandUtil().getBodyJSON(data)
 
-                resources.addResource(Resource(resourceName, resourceDetails, resourceGet))
+                val resourceName : String = request["name"].toString()
+                val resourceDetails : String = request["details"].toString()
+                val getResource: JsonObject = request["getResource"] as JsonObject
+                val postResource: JsonObject = request["postResource"] as JsonObject
+                val putResource: JsonObject = request["putResource"] as JsonObject
+                val patchResource: JsonObject = request["patchResource"] as JsonObject
+                val deleteResource: JsonObject = request["deleteResource"] as JsonObject
+
+                val getPlugin = plugins.newPluginFromRequest(getResource)
+
+                val postPlugin = plugins.newPluginFromRequest(postResource)
+
+                val putPlugin = plugins.newPluginFromRequest(putResource)
+
+                val patchPlugin = plugins.newPluginFromRequest(patchResource)
+
+                val deletePlugin = plugins.newPluginFromRequest(deleteResource)
+
+                resources.addResource(Resource(resourceName, resourceDetails, getPlugin, postPlugin, putPlugin, deletePlugin, patchPlugin))
 
                 return Response.ok().build()
             }
@@ -55,7 +71,7 @@ fun main() {
                 if (taskID.toInt() >= resources.size())
                     return Response.noContent().build()
 
-                val request = HTTPCommandUtil().getBodyJSON(data);
+                val request = HTTPCommandUtil().getBodyJSON(data)
 
                 val resourceName : String = request["name"].toString()
                 val resourceDetails : String = request["details"].toString()
@@ -65,21 +81,15 @@ fun main() {
                 val patchResource: JsonObject = request["patchResource"] as JsonObject
                 val deleteResource: JsonObject = request["deleteResource"] as JsonObject
 
+                val getPlugin = plugins.newPluginFromRequest(getResource)
 
-                val getParams = Klaxon().parseArray<Pair<String, Any>>((getResource["params"] as JsonArray<*>).toJsonString())
-                val getPlugin = plugins.newPlugin(getResource["name"] as String, *getParams!!.toTypedArray())
+                val postPlugin = plugins.newPluginFromRequest(postResource)
 
-                val postParams = Klaxon().parseArray<Pair<String, Any>>((postResource["params"] as JsonArray<*>).toJsonString())
-                val postPlugin = plugins.newPlugin(postResource["name"] as String, *postParams!!.toTypedArray())
+                val putPlugin = plugins.newPluginFromRequest(putResource)
 
-                val putParams = Klaxon().parseArray<Pair<String, Any>>((putResource["params"] as JsonArray<*>).toJsonString())
-                val putPlugin = plugins.newPlugin(putResource["name"] as String, *putParams!!.toTypedArray())
+                val patchPlugin = plugins.newPluginFromRequest(patchResource)
 
-                val patchParams = Klaxon().parseArray<Pair<String, Any>>((patchResource["params"] as JsonArray<*>).toJsonString())
-                val patchPlugin = plugins.newPlugin(patchResource["name"] as String, *patchParams!!.toTypedArray())
-
-                val deleteParams = Klaxon().parseArray<Pair<String, Any>>((deleteResource["params"] as JsonArray<*>).toJsonString())
-                val deletePlugin = plugins.newPlugin(deleteResource["name"] as String, *deleteParams!!.toTypedArray())
+                val deletePlugin = plugins.newPluginFromRequest(deleteResource)
 
 
 

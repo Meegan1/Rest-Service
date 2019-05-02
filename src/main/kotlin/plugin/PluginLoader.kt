@@ -44,6 +44,15 @@ object PluginLoader {
         return Plugin(plugin.name, *params)
     }
 
+    fun newPluginFromRequest(request: JsonObject): Plugin {
+        try {
+            val getParams = Klaxon().parseArray<Pair<String, Any>>((request["params"] as JsonArray<*>).toJsonString())
+            return this.newPlugin(request["name"] as String, *getParams!!.toTypedArray())
+        } catch(e: TypeCastException) {
+            return NullPlugin()
+        }
+    }
+
     fun getList(): MutableList<PluginConfig> {
         return this.plugins
     }
