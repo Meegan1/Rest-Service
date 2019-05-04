@@ -1,6 +1,7 @@
 package me.meegan.rest
 
 import com.beust.klaxon.Klaxon
+import me.meegan.rest.plugin.NullPlugin
 import me.meegan.rest.plugin.Plugin
 import me.meegan.rest.plugin.Script
 import javax.ws.rs.container.ContainerRequestContext
@@ -20,22 +21,16 @@ class ResourceList {
         val index = resources.binarySearch { String.CASE_INSENSITIVE_ORDER.compare(it.name, resource.name) }
 
         if(index >= 0) {
-            resources[index].name = resource.name
-            resources[index].details = resource.details
-            resources[index].get = resource.get
+            updateResource(index, resource)
         }
         else {
             resources.add(-(index + 1), resource)
             server.registerCommand(
                 resource.name,
                 object: ResourceCallback {
-                    override fun post(data: ContainerRequestContext): Response {
-                        return Response.ok().build()
-                    }
-
                     override fun get(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                                resource.get.run(data)
+                                resource.getResource.run(data)
                              }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -45,10 +40,60 @@ class ResourceList {
                         return Response.ok(response).build()
                     }
 
+                    override fun post(data: ContainerRequestContext): Response {
+                        val script: Any = try {
+                            resource.postResource.run(data)
+                        }
+                        catch (e: Exception) {
+                            e.printStackTrace()
+                            return Response.serverError().entity(e.message).build() // Returns the error as a response
+                        }
+                        val response = Klaxon().toJsonString(script)
+                        return Response.ok(response).build()
+                    }
+
+                    override fun put(data: ContainerRequestContext): Response {
+                        val script: Any = try {
+                            resource.putResource.run(data)
+                        }
+                        catch (e: Exception) {
+                            e.printStackTrace()
+                            return Response.serverError().entity(e.message).build() // Returns the error as a response
+                        }
+                        val response = Klaxon().toJsonString(script)
+                        return Response.ok(response).build()
+                    }
+
+                    override fun delete(data: ContainerRequestContext): Response {
+                        val script: Any = try {
+                            resource.deleteResource.run(data)
+                        }
+                        catch (e: Exception) {
+                            e.printStackTrace()
+                            return Response.serverError().entity(e.message).build() // Returns the error as a response
+                        }
+                        val response = Klaxon().toJsonString(script)
+                        return Response.ok(response).build()
+                    }
+
+                    override fun patch(data: ContainerRequestContext): Response {
+                        val script: Any = try {
+                            resource.patchResource.run(data)
+                        }
+                        catch (e: Exception) {
+                            e.printStackTrace()
+                            return Response.serverError().entity(e.message).build() // Returns the error as a response
+                        }
+                        val response = Klaxon().toJsonString(script)
+                        return Response.ok(response).build()
+                    }
                 }
             )
         }
+    }
 
+    fun updateResource(id: Int, resource: Resource) {
+        resources.set(id, resource)
     }
 
     fun removeResource(id: Int) {
@@ -67,6 +112,6 @@ class ResourceList {
 }
 
 
-data class Resource(var name: String, var details: String, var get: Plugin) {
+data class Resource(var name: String, var details: String, var getResource: Plugin = NullPlugin(), var postResource: Plugin = NullPlugin(), var putResource: Plugin = NullPlugin(), var deleteResource: Plugin = NullPlugin(), var patchResource: Plugin = NullPlugin()) {
     constructor(name: String, details: String, get: String) : this(name, details, Script(get))
 }

@@ -1,5 +1,7 @@
 package me.meegan.rest
 
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Klaxon
 import me.meegan.rest.plugin.PluginLoader
 import me.meegan.rest.utils.HTTPCommandUtil
@@ -16,11 +18,27 @@ fun main() {
     server.run {
         registerCommand("resources", object : ResourceCallback {
             override fun post(data: ContainerRequestContext): Response {
-                val resourceName : String = HTTPCommandUtil().getBodyJSON(data)["name"].toString()
-                val resourceDetails : String = HTTPCommandUtil().getBodyJSON(data)["details"].toString()
-                val resourceGet : String = HTTPCommandUtil().getBodyJSON(data)["get"].toString()
+                val request = HTTPCommandUtil().getBodyJSON(data)
 
-                resources.addResource(Resource(resourceName, resourceDetails, resourceGet))
+                val resourceName : String = request["name"].toString()
+                val resourceDetails : String = request["details"].toString()
+                val getResource: JsonObject = request["getResource"] as JsonObject
+                val postResource: JsonObject = request["postResource"] as JsonObject
+                val putResource: JsonObject = request["putResource"] as JsonObject
+                val patchResource: JsonObject = request["patchResource"] as JsonObject
+                val deleteResource: JsonObject = request["deleteResource"] as JsonObject
+
+                val getPlugin = plugins.newPluginFromRequest(getResource)
+
+                val postPlugin = plugins.newPluginFromRequest(postResource)
+
+                val putPlugin = plugins.newPluginFromRequest(putResource)
+
+                val patchPlugin = plugins.newPluginFromRequest(patchResource)
+
+                val deletePlugin = plugins.newPluginFromRequest(deleteResource)
+
+                resources.addResource(Resource(resourceName, resourceDetails, getPlugin, postPlugin, putPlugin, deletePlugin, patchPlugin))
 
                 return Response.ok().build()
             }
@@ -39,12 +57,44 @@ fun main() {
 
                 val json = Klaxon().toJsonString(resources[taskID.toInt()])
 
-                return Response.ok(json).build()
+                return Response.ok(resources[taskID.toInt()]).build()
             }
             override fun delete(data: ContainerRequestContext): Response {
                 val id = HTTPCommandUtil().getPathParams(data).getFirst("resource-id")
 
                 resources.removeResource(id.toInt())
+                return Response.ok().build()
+            }
+            override fun put(data: ContainerRequestContext): Response {
+                val taskID = HTTPCommandUtil().getPathParams(data).getFirst("resource-id")
+
+                if (taskID.toInt() >= resources.size())
+                    return Response.noContent().build()
+
+                val request = HTTPCommandUtil().getBodyJSON(data)
+
+                val resourceName : String = request["name"].toString()
+                val resourceDetails : String = request["details"].toString()
+                val getResource: JsonObject = request["getResource"] as JsonObject
+                val postResource: JsonObject = request["postResource"] as JsonObject
+                val putResource: JsonObject = request["putResource"] as JsonObject
+                val patchResource: JsonObject = request["patchResource"] as JsonObject
+                val deleteResource: JsonObject = request["deleteResource"] as JsonObject
+
+                val getPlugin = plugins.newPluginFromRequest(getResource)
+
+                val postPlugin = plugins.newPluginFromRequest(postResource)
+
+                val putPlugin = plugins.newPluginFromRequest(putResource)
+
+                val patchPlugin = plugins.newPluginFromRequest(patchResource)
+
+                val deletePlugin = plugins.newPluginFromRequest(deleteResource)
+
+
+
+                resources.updateResource(taskID.toInt(), Resource(resourceName, resourceDetails, getPlugin, postPlugin, putPlugin, deletePlugin, patchPlugin))
+
                 return Response.ok().build()
             }
         })
@@ -58,6 +108,17 @@ fun main() {
         registerCommand("plugins", object : ResourceCallback {
             override fun get(data: ContainerRequestContext): Response {
                 return Response.ok(plugins.getList()).build()
+            }
+        })
+
+        registerCommand("plugins/{plugin-id}", object : ResourceCallback {
+            override fun get(data: ContainerRequestContext): Response {
+                val pluginID = HTTPCommandUtil().getPathParams(data).getFirst("plugin-id")
+
+                if (pluginID.toInt() >= resources.size())
+                    return Response.noContent().build()
+
+                return Response.ok(plugins.getPlugin(pluginID.toInt())).build()
             }
         })
     }
@@ -86,6 +147,11 @@ fun main() {
             "keyboard",
             ("key" to KeyEvent.VK_RIGHT),
             ("success" to "You have moved forwards!")
+        ),
+        plugins.newPlugin(
+            "keyboard",
+            ("key" to KeyEvent.VK_LEFT),
+            ("success" to "You have moved backwards!")
         )
     ))
 

@@ -31,13 +31,26 @@ object PluginLoader {
         }
     }
 
-    fun getPlugin(name: String): PluginConfig {
-        return plugins.find { it.name == name }!!
+    fun getPlugin(name: String): PluginConfig? {
+        return plugins.find { it.name == name }
+    }
+
+    fun getPlugin(id: Int): PluginConfig {
+        return plugins[id]
     }
 
     fun newPlugin(name : String, vararg params : Pair<String, Any>) : Plugin {
-        var plugin = getPlugin(name)
+        val plugin = getPlugin(name) ?: return NullPlugin()
         return Plugin(plugin.name, *params)
+    }
+
+    fun newPluginFromRequest(request: JsonObject): Plugin {
+        try {
+            val getParams = Klaxon().parseArray<Pair<String, Any>>((request["params"] as JsonArray<*>).toJsonString())
+            return this.newPlugin(request["name"] as String, *getParams!!.toTypedArray())
+        } catch(e: TypeCastException) {
+            return NullPlugin()
+        }
     }
 
     fun getList(): MutableList<PluginConfig> {
