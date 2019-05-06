@@ -30,7 +30,7 @@ class ResourceList {
                 object: ResourceCallback {
                     override fun get(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                                resource.getResource.run(data)
+                            resources.find { it.name == resource.name }?.getResource?.run(data)!!
                              }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -42,7 +42,7 @@ class ResourceList {
 
                     override fun post(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            resource.postResource.run(data)
+                            resources.find { it.name == resource.name }?.postResource?.run(data)!!
                         }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -54,7 +54,7 @@ class ResourceList {
 
                     override fun put(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            resource.putResource.run(data)
+                            resources.find { it.name == resource.name }?.putResource?.run(data)!!
                         }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -66,7 +66,7 @@ class ResourceList {
 
                     override fun delete(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            resource.deleteResource.run(data)
+                            resources.find { it.name == resource.name }?.deleteResource?.run(data)!!
                         }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -78,7 +78,7 @@ class ResourceList {
 
                     override fun patch(data: ContainerRequestContext): Response {
                         val script: Any = try {
-                            resource.patchResource.run(data)
+                            resources.find { it.name == resource.name }?.patchResource?.run(data)!!
                         }
                         catch (e: Exception) {
                             e.printStackTrace()
@@ -93,7 +93,13 @@ class ResourceList {
     }
 
     fun updateResource(id: Int, resource: Resource) {
-        resources.set(id, resource)
+        val index = resources.binarySearch { String.CASE_INSENSITIVE_ORDER.compare(it.name, resource.name) }
+        if(index >= 0)
+            resources[id] = resource
+        else {
+            removeResource(id)
+            addResource(resource)
+        }
     }
 
     fun removeResource(id: Int) {
