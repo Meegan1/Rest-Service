@@ -1,6 +1,7 @@
 package me.meegan.rest.plugin
 
 import com.beust.klaxon.*
+import de.swirtz.ktsrunner.objectloader.KtsObjectLoader
 import java.io.File
 
 object PluginLoader {
@@ -9,6 +10,7 @@ object PluginLoader {
 
     init {
         directory.mkdirs()
+        KtsObjectLoader().load<Any>("true") // initialise JVM
         reload()
     }
 
