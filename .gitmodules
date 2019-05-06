@@ -1,0 +1,3 @@
+[submodule "plugins"]
+	path = plugins
+	url = git@github.com:Meegan1/Rest-Service-Plugins.git
