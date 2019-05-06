@@ -56,6 +56,7 @@ dependencies {
 
     compile 'de.swirtz:ktsRunner:0.0.7'
     compile 'org.jetbrains.kotlin:kotlin-reflect:1.3.10'
+    compile "com.pi4j:pi4j-core:1.2"
 }
 
 
